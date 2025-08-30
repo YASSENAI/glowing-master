@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Glowing_Master — متجر مستحضرات التجميل</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Urbanist:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ====== Variables ====== */
+    :root{
+      --bg:#ffffff;
+      --muted:#6d6d6d;
+      --accent:#0b7a5f;
+      --accent-2:#074f3c;
+      --card:#fbfbfb;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 12px 30px rgba(10,10,10,0.06);
+      --radius:12px;
+      --max-w:1200px;
+      --tran: 0.28s ease;
+    }
+
+    /* ====== Reset ====== */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px}
+    body{
+      font-family: 'Cairo', 'Urbanist', system-ui, sans-serif;
+      background: linear-gradient(180deg,#fff,#fbfcfd);
+      color:#111; -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block;height:auto}
+    button{font-family:inherit}
+
+    /* ====== Layout ====== */
+    .wrap{max-width:var(--max-w);margin:26px auto;padding:0 16px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand img{width:150px;height:auto}
+    .brand-title{font-weight:800}
+    .brand-sub{color:var(--muted);font-size:0.95rem}
+
+    /* ====== controls ====== */
+    .controls{display:flex;gap:12px;align-items:center}
+    .search{border:1px solid #eee;padding:8px 12px;border-radius:10px;min-width:220px;transition:var(--tran)}
+    .search:focus{outline:none;box-shadow:0 6px 20px rgba(11,122,95,0.08)}
+    .lang-toggle{display:flex;gap:8px}
+    .lang-btn{padding:8px 12px;border-radius:8px;border:1px solid #eee;background:#fff;cursor:pointer;transition:var(--tran)}
+    .lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+    .cart{display:flex;gap:8px;align-items:center;border:1px solid #eee;padding:8px 12px;border-radius:12px;background:#fff;box-shadow:var(--shadow)}
+    .cart .total{font-weight:800}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}
+
+    /* ====== Hero ====== */
+    .hero{display:grid;grid-template-columns:1fr;gap:14px;padding:20px;border-radius:14px;background:linear-gradient(180deg,#fff,#fbfbfb);box-shadow:var(--shadow);align-items:center;margin-bottom:18px}
+    .hero-left{padding:6px}
+    .hero-title{font-size:1.9rem;font-weight:800;margin-bottom:6px}
+    .hero-sub{color:var(--muted);margin-bottom:12px}
+    .hero-price{font-weight:800;font-size:1.05rem;color:var(--accent);margin-bottom:12px}
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;border:none}
+    .ghost{background:#fff;color:var(--accent);border:1px solid #eee}
+
+    /* ====== Grid ====== */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;position:relative;transition:transform var(--tran),box-shadow var(--tran)}
+    .card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(10,10,10,0.08)}
+    .img{border-radius:10px;overflow:hidden;height:220px;background:#eee;margin-bottom:12px;position:relative}
+    .badge{position:absolute;top:10px;left:10px;background:var(--accent);color:#fff;padding:6px 8px;border-radius:8px;font-weight:700;font-size:.85rem}
+    .card h3{font-size:1.05rem;margin-bottom:6px;text-align:center}
+    .meta{font-size:.95rem;color:var(--muted);text-align:center;margin-bottom:8px}
+    .price-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:auto}
+    .del{color:var(--muted);text-decoration:line-through;font-size:.95rem}
+    .now{font-weight:800;font-size:1.05rem}
+
+    .card .actions{display:flex;gap:8px;justify-content:center;margin-top:10px}
+    .small{padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+
+    /* ====== Offer banner ====== */
+    .offer{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:linear-gradient(90deg,#fff,#f8fff8);box-shadow:var(--shadow);margin:18px 0}
+
+    /* ====== Modal / Quick view ====== */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:var(--tran)}
+    .modal.open{opacity:1;pointer-events:all}
+    .modal-card{background:#fff;border-radius:12px;max-width:920px;width:94%;display:grid;grid-template-columns:1fr;gap:12px;padding:14px;box-shadow:var(--shadow)}
+    @media(min-width:900px){ .modal-card{grid-template-columns:1fr 1fr} }
+
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+    .thumbs img{width:72px;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
+    .thumbs img.active{border-color:var(--accent)}
+
+    /* ====== Toast ====== */
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#111;color:#fff;padding:12px 18px;border-radius:10px;z-index:10000;opacity:0;transition:var(--tran)}
+
+    /* ====== Checkout mini ====== */
+    .checkout{position:fixed;right:18px;bottom:18px;background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow);min-width:260px;z-index:999}
+    .cart-line{display:flex;justify-content:space-between;border-bottom:1px dashed #eee;padding:8px 0}
+    .cart-empty{text-align:center;color:var(--muted);padding:12px}
+
+    /* ====== Animations ====== */
+    .fade-up{transform:translateY(18px);opacity:0;transition: var(--tran) }
+    .fade-up.in{transform:none;opacity:1}
+
+    /* ====== RTL helpers ====== */
+    [dir="rtl"] .badge{left:auto;right:10px}
+    [dir="rtl"] .topbar{direction:rtl}
+    [dir="ltr"] .topbar{direction:ltr}
+    [dir="rtl"] .thumbs{flex-direction:row-reverse}
+
+    /* ====== responsive ====== */
+    @media(min-width:900px){
+      .hero{grid-template-columns:1fr 420px}
+      .hero-left{padding-right:18px}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap" id="page">
+
+    <!-- TOP -->
+    <div class="topbar">
+      <div class="brand">
+        <img src="./assets/images/logo.png" alt="logo" id="logo">
+        <div>
+          <div class="brand-title" id="brand-title" data-i18n="brand">Glowing_Master</div>
+          <div class="brand-sub" id="brand-sub" data-i18n="brand-sub">منتجات تجميل طبيعية وآمنة</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input class="search" id="search" placeholder="ابحث عن منتج" data-i18n-placeholder="search" />
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="btn-ar">العربي</button>
+          <button class="lang-btn" id="btn-en">English</button>
+        </div>
+
+        <div class="cart" id="cartWrap" aria-live="polite">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18a2 2 0 1 0 .001 3.999A2 2 0 0 0 7 18zm10 0a2 2 0 1 0 .001 3.999A2 2 0 0 0 17 18zM7.16 10l-.9-2H3V6h3.45l1.89 4.2L9.8 14H19v-2H10.4l-.24-.6L7.16 10z"/></svg>
+          <div>
+            <div class="meta" id="cart-label" data-i18n="cart">عربة التسوق</div>
+            <div class="total" id="cartTotal">0.00 جنيه</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero fade-up" id="hero">
+      <div class="hero-left">
+        <h1 class="hero-title" id="hero-title" data-i18n="hero-title">جمال بشرتك يبدأ من هنا</h1>
+        <p class="hero-sub" id="hero-sub" data-i18n="hero-sub">منتجات طبيعية وآمنة تناسب كل أنواع البشرة</p>
+        <p class="hero-price"><span data-price="from">الأسعار تبدأ من</span> <strong id="minPrice">250</strong> <span id="currency">جنيه</span></p>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+          <button class="btn" id="cta" data-i18n="shop-now">تسوق دلوقتي</button>
+          <button class="ghost small" id="view-deal" data-i18n="view-deal">شاهد العرض</button>
+        </div>
+        <p class="meta note" id="ship-note" data-i18n="ship">شحن مجاني للطلبات فوق 1500 جنيه</p>
+      </div>
+
+      <div>
+        <img src="./assets/images/hero-banner-1.jpg" alt="hero" style="border-radius:12px;box-shadow:var(--shadow);max-height:340px;object-fit:cover;width:100%">
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <div class="filters fade-up" id="filters">
+      <select id="sort" class="small" aria-label="sort">
+        <option value="popular" data-i18n="sort-popular">الأكثر شهرة</option>
+        <option value="price-asc" data-i18n="sort-price-asc">الأرخص أولاً</option>
+        <option value="price-desc" data-i18n="sort-price-desc">الأغلى أولاً</option>
+      </select>
+
+      <select id="category" class="small" aria-label="category">
+        <option value="all" data-i18n="cat-all">كل الفئات</option>
+        <option value="face" data-i18n="cat-face">وجه</option>
+        <option value="body" data-i18n="cat-body">جسم</option>
+        <option value="hair" data-i18n="cat-hair">شعر</option>
+      </select>
+
+      <button class="small ghost" id="clearFilters" data-i18n="clear">مسح الفلاتر</button>
+    </div>
+
+    <!-- Products -->
+    <h2 style="margin:18px 0;font-weight:800" id="products-title" data-i18n="products">الأكثر مبيعًا</h2>
+
+    <div class="grid fade-up" id="products">
+      <!-- JS inject -->
+    </div>
+
+    <!-- Offer -->
+    <div class="offer fade-up">
+      <img src="./assets/images/offer-banner-1.jpg" alt="offer" style="width:120px;height:120px;object-fit:cover;border-radius:12px">
+      <div>
+        <div style="font-weight:800" id="offer-title" data-i18n="offer">عرض خاص</div>
+        <div class="meta" id="offer-desc" data-i18n="offer-desc">زيت استحمام برائحة الصنوبر — <strong id="offer-price">999 جنيه</strong></div>
+        <div style="margin-top:8px">
+          <button class="btn" id="offer-btn" data-i18n="buy-offer">اشتري العرض</button>
+        </div>
+      </div>
+    </div>
+
+    <footer style="margin-top:28px">
+      <div class="meta" id="footer-text" data-i18n="footer">جميع الحقوق محفوظة © 2025 Glowing_Master</div>
+    </footer>
+  </div>
+
+  <!-- Modal quick view -->
+  <div class="modal" id="modal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div>
+        <div style="height:100%;display:flex;flex-direction:column;gap:10px">
+          <img id="modal-main-img" src="./assets/images/product-01.jpg" alt="" style="width:100%;height:100%;max-height:420px;object-fit:cover;border-radius:10px">
+          <div class="thumbs" id="modal-thumbs"></div>
+        </div>
+      </div>
+      <div>
+        <h3 id="modal-title">Product</h3>
+        <p class="meta" id="modal-cat">فئة</p>
+        <p id="modal-desc" class="meta">وصف بسيط للمنتج</p>
+        <div style="margin:10px 0" id="modal-price"><span class="del" id="modal-old"></span> <span class="now" id="modal-now"></span></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn" id="modal-add">أضف للسلة</button>
+          <button class="ghost small" id="modal-close">اغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Checkout mini -->
+  <div class="checkout" id="checkout">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong id="mini-title" data-i18n="cart">عربة التسوق</strong>
+      <button class="small ghost" id="clearCart" data-i18n="clear-cart">افرغ</button>
+    </div>
+    <div id="cart-list" style="margin-top:8px;max-height:220px;overflow:auto"></div>
+    <div style="margin-top:8px">
+      <div class="cart-line"><div data-i18n="subtotal">المجموع</div><div id="mini-total">0.00 جنيه</div></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="checkout-btn" data-i18n="checkout">الدفع</button>
+        <button class="ghost small" id="continue" data-i18n="continue">تابع التسوق</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ========== Product data (expand as needed) ========== */
+const PRODUCTS = [
+  { id:'p1', slug:'facial-cleanser', imgs:['./assets/images/product-01.jpg','./assets/images/product-02.jpg'], cat:'face',
+    name_ar:'منظف للوجه', name_en:'Facial Cleanser', price:899, old:1200, badge:'-20%', desc_ar:'منظف لطيف ينضف بعمق بدون تجفيف البشرة', desc_en:'Gentle cleanser that removes dirt without drying' },
+  { id:'p2', slug:'brightening-serum', imgs:['./assets/images/product-02.jpg','./assets/images/product-03.jpg'], cat:'face',
+    name_ar:'سيروم تفتيح', name_en:'Brightening Serum', price:750, old:null, badge:'', desc_ar:'سيروم مركز لتفتيح البشرة وتقليل البقع', desc_en:'Concentrated serum for brightening and spots' },
+  { id:'p3', slug:'eye-cream', imgs:['./assets/images/product-03.jpg','./assets/images/product-04.jpg'], cat:'face',
+    name_ar:'كريم للعين', name_en:'Eye Cream', price:650, old:null, badge:'', desc_ar:'كريم خفيف يقلل الانتفاخ والهالات', desc_en:'Light cream to reduce puffiness and dark circles' },
+  { id:'p4', slug:'body-oil', imgs:['./assets/images/product-05.jpg','./assets/images/product-06.jpg'], cat:'body',
+    name_ar:'زيت للجسم', name_en:'Body Oil', price:399, old:499, badge:'-20%', desc_ar:'مرطب ومغذي للبشرة بعد الاستحمام', desc_en:'Hydrating body oil for post-shower nourishment' },
+  { id:'p5', slug:'shampoo-repair', imgs:['./assets/images/product-07.jpg','./assets/images/product-08.jpg'], cat:'hair',
+    name_ar:'شامبو ترميم', name_en:'Repair Shampoo', price:299, old:null, badge:'', desc_ar:'شامبو لتقوية الشعر والتقليل من التقصف', desc_en:'Strengthening shampoo to reduce split ends' },
+  { id:'p6', slug:'perfume', imgs:['./assets/images/product-09.jpg','./assets/images/product-10.jpg'], cat:'body',
+    name_ar:'عطر فرنسي', name_en:'French Perfume', price:1299, old:1699, badge:'-25%', desc_ar:'عطر برائحة فاخرة تدوم لساعات', desc_en:'Long-lasting luxurious fragrance' },
+  { id:'p7', slug:'mask', imgs:['./assets/images/product-11.jpg','./assets/images/product-01.jpg'], cat:'face',
+    name_ar:'قناع مغذي', name_en:'Nourishing Mask', price:189, old:null, badge:'', desc_ar:'قناع يساعد على تغذية البشرة وتجديدها', desc_en:'Mask that nourishes and renews skin' },
+  { id:'p8', slug:'hand-cream', imgs:['./assets/images/product-05.jpg','./assets/images/product-02.jpg'], cat:'body',
+    name_ar:'كريم لليدين', name_en:'Hand Cream', price:129, old:null, badge:'', desc_ar:'مرطب سريع الامتصاص لليدين', desc_en:'Quick-absorbing hand moisturizer' }
+];
+
+/* ========== Translations ========= */
+const TRANSLATIONS = {
+  ar:{
+    brand:'Glowing_Master',
+    'brand-sub':'منتجات تجميل طبيعية وآمنة',
+    search:'ابحث عن منتج',
+    'hero-title':'جمال بشرتك يبدأ من هنا',
+    'hero-sub':'منتجات طبيعية وآمنة تناسب كل أنواع البشرة',
+    'shop-now':'تسوق دلوقتي',
+    'view-deal':'شاهد العرض',
+    ship:'شحن مجاني للطلبات فوق 1500 جنيه',
+    products:'الأكثر مبيعًا',
+    offer:'عرض خاص',
+    'offer-desc':'زيت استحمام برائحة الصنوبر —',
+    'buy-offer':'اشتري العرض',
+    footer:'جميع الحقوق محفوظة © 2025 Glowing_Master',
+    cart:'عربة التسوق',
+    'sort-popular':'الأكثر شهرة',
+    'sort-price-asc':'الأرخص أولاً',
+    'sort-price-desc':'الأغلى أولاً',
+    'cat-all':'كل الفئات','cat-face':'وجه','cat-body':'جسم','cat-hair':'شعر',
+    clear:'مسح الفلاتر','clear-cart':'افرغ','subtotal':'المجموع','checkout':'الدفع','continue':'تابع التسوق'
+  },
+  en:{
+    brand:'Glowing_Master',
+    'brand-sub':'Natural & safe beauty products',
+    search:'Search product',
+    'hero-title':'Reveal the beauty of your skin',
+    'hero-sub':'Clean, non-toxic products suitable for everyone',
+    'shop-now':'Shop Now',
+    'view-deal':'View Deal',
+    ship:'Free shipping for orders over 1500 EGP',
+    products:'Bestsellers',
+    offer:'Special Offer',
+    'offer-desc':'Mountain Pine Bath Oil —',
+    'buy-offer':'Buy Offer',
+    footer:'All rights reserved © 2025 Glowing_Master',
+    cart:'Cart',
+    'sort-popular':'Most popular','sort-price-asc':'Price: low to high','sort-price-desc':'Price: high to low',
+    'cat-all':'All categories','cat-face':'Face','cat-body':'Body','cat-hair':'Hair',
+    clear:'Clear filters','clear-cart':'Clear','subtotal':'Subtotal','checkout':'Checkout','continue':'Continue Shopping'
+  }
+};
+
+/* ========== State ========== */
+let currentLang = localStorage.getItem('site_lang') || 'ar';
+let CART = JSON.parse(localStorage.getItem('cart_v1')||'[]');
+
+/* ========== Utils ======== */
+function t(key){ return TRANSLATIONS[currentLang][key] ?? key; }
+function formatPrice(n){
+  if(currentLang==='ar') return new Intl.NumberFormat('ar-EG',{maximumFractionDigits:0}).format(n) + ' جنيه';
+  return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n) + ' EGP';
+}
+function showToast(text){
+  const el = document.getElementById('toast');
+  el.textContent = text;
+  el.style.opacity = '1';
+  setTimeout(()=> el.style.opacity='0',1700);
+}
+
+/* ========== Render UI ======== */
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('site_lang',lang);
+  document.documentElement.lang = (lang==='ar') ? 'ar' : 'en';
+  document.documentElement.dir = (lang==='ar') ? 'rtl' : 'ltr';
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+
+  // translate static texts and placeholders
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    el.innerHTML = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.setAttribute('placeholder', t(key));
+  });
+
+  // currency label
+  document.getElementById('currency').textContent = (lang==='ar') ? 'جنيه' : 'EGP';
+  document.querySelectorAll('[data-price="from"]').forEach(el=>{
+    el.textContent = (lang==='ar') ? 'الأسعار تبدأ من' : 'Prices from';
+  });
+
+  // re-render dynamic pieces
+  renderProducts();
+  renderCart();
+}
+
+/* ========== Product grid ======== */
+function renderProducts(filter='all', sort='popular', query=''){
+  const container = document.getElementById('products');
+  container.innerHTML = '';
+  let items = PRODUCTS.slice();
+
+  if(filter!=='all') items = items.filter(it=>it.cat===filter);
+  if(query) items = items.filter(it=>{
+    const name = currentLang==='ar' ? it.name_ar : it.name_en;
+    return name.toLowerCase().includes(query.toLowerCase());
+  });
+  if(sort==='price-asc') items.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc') items.sort((a,b)=>b.price-a.price);
+  // popular = original order
+
+  items.forEach(p=>{
+    const card = document.createElement('article');
+    card.className = 'card fade-up';
+    // image
+    const imgWrap = document.createElement('div'); imgWrap.className='img';
+    const img = document.createElement('img'); img.src = p.imgs[0]; img.alt = currentLang==='ar'?p.name_ar:p.name_en;
+    imgWrap.appendChild(img);
+    if(p.badge) {
+      const badge = document.createElement('div'); badge.className='badge'; badge.textContent=p.badge;
+      imgWrap.appendChild(badge);
+    }
+    // title & meta
+    const title = document.createElement('h3'); title.textContent = (currentLang==='ar')?p.name_ar:p.name_en;
+    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = (currentLang==='ar')?p.desc_ar:p.desc_en;
+    // price row
+    const priceRow = document.createElement('div'); priceRow.className='price-row';
+    if(p.old){ const del = document.createElement('div'); del.className='del'; del.textContent = formatPrice(p.old); priceRow.appendChild(del); }
+    const now = document.createElement('div'); now.className='now'; now.textContent = formatPrice(p.price); priceRow.appendChild(now);
+
+    // actions
+    const actions = document.createElement('div'); actions.className='actions';
+    const quick = document.createElement('button'); quick.className='small ghost'; quick.textContent = (currentLang==='ar') ? 'عرض سريع' : 'Quick View';
+    quick.addEventListener('click',()=> openModal(p.id));
+    const add = document.createElement('button'); add.className='small'; add.textContent = (currentLang==='ar') ? 'أضف للسلة' : 'Add to cart';
+    add.addEventListener('click',()=> { addToCart(p.id); animateAdd(add); });
+    actions.appendChild(quick); actions.appendChild(add);
+
+    card.appendChild(imgWrap); card.appendChild(title); card.appendChild(meta); card.appendChild(priceRow); card.appendChild(actions);
+    container.appendChild(card);
+    // animate in
+    setTimeout(()=> card.classList.add('in'), 80);
+  });
+}
+
+/* ========== Modal ======== */
+const modal = document.getElementById('modal');
+function openModal(productId){
+  const p = PRODUCTS.find(x=>x.id===productId);
+  if(!p) return;
+  document.getElementById('modal-title').textContent = currentLang==='ar' ? p.name_ar : p.name_en;
+  document.getElementById('modal-cat').textContent = currentLang==='ar' ? (p.cat==='face'?'وجه': p.cat==='body'?'جسم':'شعر') : p.cat;
+  document.getElementById('modal-desc').textContent = currentLang==='ar' ? p.desc_ar : p.desc_en;
+  document.getElementById('modal-now').textContent = formatPrice(p.price);
+  document.getElementById('modal-old').textContent = p.old ? formatPrice(p.old) : '';
+  document.getElementById('modal-main-img').src = p.imgs[0];
+
+  const thumbs = document.getElementById('modal-thumbs'); thumbs.innerHTML='';
+  p.imgs.forEach((src,i)=>{
+    const im = document.createElement('img'); im.src=src; if(i===0) im.classList.add('active');
+    im.addEventListener('click',()=>{ document.getElementById('modal-main-img').src=src; thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active')); im.classList.add('active'); });
+    thumbs.appendChild(im);
+  });
+
+  document.getElementById('modal-add').onclick = ()=> { addToCart(p.id); closeModal(); };
+  modal.classList.add('open');
+}
+function closeModal(){ modal.classList.remove('open'); }
+document.getElementById('modal-close').addEventListener('click',closeModal);
+modal.addEventListener('click', (e)=> { if(e.target===modal) closeModal(); });
+
+/* ========== Cart logic ======== */
+function saveCart(){ localStorage.setItem('cart_v1', JSON.stringify(CART)); }
+function addToCart(id){
+  const p = PRODUCTS.find(x=>x.id===id) || null;
+  if(!p) return;
+  const found = CART.find(x=>x.id===id);
+  if(found){ found.qty = (found.qty||1) + 1; }
+  else { CART.push({...p, qty:1}); }
+  saveCart(); renderCart(); showToast(currentLang==='ar'? 'اتضاف للعربة' : 'Added to cart');
+}
+function removeFromCart(id){
+  CART = CART.filter(x=>x.id!==id); saveCart(); renderCart();
+}
+function changeQty(id, delta){
+  const it = CART.find(x=>x.id===id); if(!it) return;
+  it.qty = Math.max(1, it.qty + delta); saveCart(); renderCart();
+}
+function cartTotal(){
+  return CART.reduce((s,i)=> s + (i.price * (i.qty||1)),0);
+}
+function renderCart(){
+  const list = document.getElementById('cart-list'); list.innerHTML='';
+  if(CART.length===0){ list.innerHTML = `<div class="cart-empty">${ currentLang==='ar' ? 'العربة فاضية' : 'Cart is empty' }</div>`; }
+  else {
+    CART.forEach(item=>{
+      const line = document.createElement('div'); line.className='cart-line';
+      const left = document.createElement('div'); left.style.maxWidth='65%';
+      left.innerHTML = `<div style="font-weight:700">${ currentLang==='ar' ? item.name_ar : item.name_en }</div><div class="meta">${ formatPrice(item.price) }</div>`;
+      const right = document.createElement('div'); right.style.textAlign='right';
+      right.innerHTML = `<div style="display:flex;gap:6px;align-items:center;justify-content:flex-end">
+        <button class="small" aria-label="minus">-</button>
+        <div style="min-width:28px;text-align:center">${ item.qty || 1 }</div>
+        <button class="small" aria-label="plus">+</button>
+      </div>
+      <div style="margin-top:6px"><button class="small ghost" aria-label="remove">إزالة</button></div>`;
+      // events
+      right.querySelectorAll('button')[0].addEventListener('click', ()=> changeQty(item.id, -1));
+      right.querySelectorAll('button')[1].addEventListener('click', ()=> changeQty(item.id, +1));
+      right.querySelectorAll('button')[2].addEventListener('click', ()=> removeFromCart(item.id));
+      line.appendChild(left); line.appendChild(right);
+      list.appendChild(line);
+    });
+  }
+  document.getElementById('mini-total').textContent = formatPrice(cartTotal());
+  document.getElementById('cartTotal').textContent = formatPrice(cartTotal());
+}
+
+/* ========== Small helpers ======== */
+function animateAdd(el){
+  el.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:350,easing:'ease-out'});
+}
+
+/* ========== Filters / search / sort ======== */
+const sortEl = document.getElementById('sort'), catEl = document.getElementById('category'), searchEl = document.getElementById('search');
+document.getElementById('clearFilters').addEventListener('click', ()=> { sortEl.value='popular'; catEl.value='all'; searchEl.value=''; renderProducts(); });
+sortEl.addEventListener('change', ()=> renderProducts(catEl.value, sortEl.value, searchEl.value));
+catEl.addEventListener('change', ()=> renderProducts(catEl.value, sortEl.value, searchEl.value));
+searchEl.addEventListener('input', ()=> renderProducts(catEl.value, sortEl.value, searchEl.value));
+
+/* ========== Offer button ======== */
+document.getElementById('offer-btn').addEventListener('click', ()=> {
+  // add special offer as product
+  const offer = PRODUCTS.find(x=>x.id==='p4') || PRODUCTS[0];
+  addToCart(offer.id);
+});
+
+/* ========== Language toggles & init ======== */
+document.getElementById('btn-ar').addEventListener('click', ()=> setLang('ar'));
+document.getElementById('btn-en').addEventListener('click', ()=> setLang('en'));
+
+document.getElementById('cta').addEventListener('click', ()=> document.getElementById('products').scrollIntoView({behavior:'smooth'}));
+document.getElementById('view-deal').addEventListener('click', ()=> { document.getElementById('offer-btn').click(); });
+
+document.getElementById('clearCart').addEventListener('click', ()=> { CART = []; saveCart(); renderCart(); showToast(currentLang==='ar' ? 'اتفرغت العربة' : 'Cart cleared'); });
+document.getElementById('checkout-btn').addEventListener('click', ()=> {
+  if(CART.length===0){ showToast(currentLang==='ar' ? 'العربة فاضية' : 'Cart is empty'); return; }
+  // simple checkout flow (mock)
+  const total = cartTotal();
+  if(confirm((currentLang==='ar'? 'اكمل الدفع بمبلغ ':'Proceed to pay ') + formatPrice(total) + (currentLang==='ar' ? ' ؟' : ' ?'))){
+    CART = []; saveCart(); renderCart();
+    showToast(currentLang==='ar' ? 'تمت عملية الدفع تجريبياً — شكراً' : 'Test payment complete — thank you');
+  }
+});
+document.getElementById('continue').addEventListener('click', ()=> { window.scrollTo({top:0,behavior:'smooth'}); });
+
+/* ========== Small keyboard accessibility ======== */
+document.addEventListener('keydown',(e)=>{ if(e.key==='l'){ setLang(currentLang==='ar'?'en':'ar'); } if(e.key==='Escape'){ closeModal(); } });
+
+/* ========== Init ======== */
+setLang(currentLang);
+renderProducts();
+renderCart();
+
+// small entrance animations
+setTimeout(()=> document.querySelectorAll('.fade-up').forEach(x=> x.classList.add('in') ), 200);
+
+// persist cart on unload
+window.addEventListener('beforeunload', saveCart);
+
+</script>
+</body>
+</html>
